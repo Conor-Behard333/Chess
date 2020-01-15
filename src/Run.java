@@ -321,13 +321,13 @@ public class Run extends Application {
         double xRight = x + 100;
         double xLeft = x - 100;
     
-        checkBishopMoves(xRight, yUp, board, colour, piece, actualMove, 100, -100);//upper right
-        checkBishopMoves(xRight, yDown, board, colour, piece, actualMove, 100, 100);//bottom right
-        checkBishopMoves(xLeft, yUp, board, colour, piece, actualMove, -100, -100);//upper left
-        checkBishopMoves(xLeft, yDown, board, colour, piece, actualMove, -100, 100);//bottom left
+        addConsecutiveMoves(xRight, yUp, board, colour, piece, actualMove, 100, -100);//upper right
+        addConsecutiveMoves(xRight, yDown, board, colour, piece, actualMove, 100, 100);//bottom right
+        addConsecutiveMoves(xLeft, yUp, board, colour, piece, actualMove, -100, -100);//upper left
+        addConsecutiveMoves(xLeft, yDown, board, colour, piece, actualMove, -100, 100);//bottom left
     }
     
-    private void checkBishopMoves(double newX, double newY, ImageView[][] board, String colour, ImageView piece, boolean actualMove, int xIncrement, int yIncrement) {
+    private void addConsecutiveMoves(double newX, double newY, ImageView[][] board, String colour, ImageView piece, boolean actualMove, int xIncrement, int yIncrement) {
         double x = newX;
         double y = newY;
         String opponentColour = getOpponentColour(colour);
@@ -346,64 +346,10 @@ public class Run extends Application {
     }
     
     private void rookMoves(double x, double y, ImageView[][] board, String colour, ImageView piece, boolean actualMove) {
-        if (colour.contains("White")) {
-            for (int i = (int) y - 100; i >= 0; i -= 100) {//up
-                if (addRookMoves(x, i, board, colour, piece, actualMove)) {
-                    continue;
-                }
-                break;
-            }
-            
-            for (int i = (int) y + 100; i <= 700; i += 100) {//down
-                if (addRookMoves(x, i, board, colour, piece, actualMove)) {
-                    continue;
-                }
-                break;
-            }
-        } else {
-            for (int i = (int) y + 100; i <= 700; i += 100) {//up
-                if (addRookMoves(x, i, board, colour, piece, actualMove)) {
-                    continue;
-                }
-                break;
-            }
-            
-            for (int i = (int) y - 100; i >= 0; i -= 100) {//down
-                if (addRookMoves(x, i, board, colour, piece, actualMove)) {
-                    continue;
-                }
-                break;
-            }
-        }
-        
-        for (int i = (int) x + 100; i <= 700; i += 100) {//right
-            if (addRookMoves(i, y, board, colour, piece, actualMove)) {
-                continue;
-            }
-            break;
-        }
-        
-        for (int i = (int) x - 100; i >= 0; i -= 100) {//left
-            if (addRookMoves(i, y, board, colour, piece, actualMove)) {
-                continue;
-            }
-            break;
-        }
-    }
-    
-    private boolean addRookMoves(double row, double col, ImageView[][] board, String colour, ImageView piece, boolean actualMove) {
-        String id = board[(int) (row / 100)][(int) (col / 100)].getId();
-        if (isEmpty(row, col, board)) {
-            addMove(board, getOpponentColour(colour), row, col, piece, actualMove);
-            return true;
-        } else if (id.contains("Black") && colour.contains("White")) {
-            addMove(board, getOpponentColour(colour), row, col, piece, actualMove);
-            return false;
-        } else if (id.contains("White") && colour.contains("Black")) {
-            addMove(board, getOpponentColour(colour), row, col, piece, actualMove);
-            return false;
-        }
-        return false;
+        addConsecutiveMoves(x + 100, y, board, colour, piece, actualMove, 100, 0);//all right
+        addConsecutiveMoves(x - 100, y, board, colour, piece, actualMove, -100, 0);//all left
+        addConsecutiveMoves(x, y + 100, board, colour, piece, actualMove, 0, 100);//all up/down
+        addConsecutiveMoves(x, y - 100, board, colour, piece, actualMove, 0, -100);//all down/up
     }
     
     private boolean isEmpty(double x, double y, ImageView[][] board) {
