@@ -242,9 +242,8 @@ public class Run extends Application {
         clickedSquare.setId(pieces[index].getId());
         board[(int) x / 100][(int) y / 100].setId("empty");
         p1 = colour.equalsIgnoreCase("black");
-        movePiece = false;
         pickPiece = true;
-        moves.clear();
+        movePiece = false;
         if (p1) {
             playerTurn.setText("White Players Turn");
         } else {
@@ -317,66 +316,33 @@ public class Run extends Application {
     }
     
     private void bishopMoves(double x, double y, ImageView[][] board, String colour, ImageView piece, boolean actualMove) {
-        checkUpperRight(x, y, board, colour, piece, actualMove);
-        checkUpperLeft(x, y, board, colour, piece, actualMove);
-        checkBottomLeft(x, y, board, colour, piece, actualMove);
-        checkBottomRight(x, y, board, colour, piece, actualMove);
+        double yUp = y - 100;
+        double yDown = y + 100;
+        double xRight = x + 100;
+        double xLeft = x - 100;
+    
+        checkBishopMoves(xRight, yUp, board, colour, piece, actualMove, 100, -100);//upper right
+        checkBishopMoves(xRight, yDown, board, colour, piece, actualMove, 100, 100);//bottom right
+        checkBishopMoves(xLeft, yUp, board, colour, piece, actualMove, -100, -100);//upper left
+        checkBishopMoves(xLeft, yDown, board, colour, piece, actualMove, -100, 100);//bottom left
     }
     
-    private void checkBottomLeft(double x, double y, ImageView[][] board, String colour, ImageView piece, boolean actualMove) {
-        double newX = x - 100;
-        double newY = y + 100;
+    private void checkBishopMoves(double newX, double newY, ImageView[][] board, String colour, ImageView piece, boolean actualMove, int xIncrement, int yIncrement) {
+        double x = newX;
+        double y = newY;
         String opponentColour = getOpponentColour(colour);
-        while (((newX >= 0) && (newY <= 700) && isEmpty(newX, newY, board)) || (newX >= 0) && (newY <= 700) && board[(int) newX / 100][(int) newY / 100].getId().contains(opponentColour)) {
-            addMove(board, opponentColour, newX, newY, piece, actualMove);
-            if (board[(int) newX / 100][(int) newY / 100].getId().contains(opponentColour)) {
+        while ((checkBounds(x, y) && isEmpty(x, y, board)) || (checkBounds(x, y) && board[(int) x / 100][(int) y / 100].getId().contains(opponentColour))) {
+            addMove(board, opponentColour, x, y, piece, actualMove);
+            if (board[(int) x / 100][(int) y / 100].getId().contains(opponentColour)) {
                 break;
             }
-            newX -= 100;
-            newY += 100;
+            x += xIncrement;
+            y += yIncrement;
         }
     }
     
-    private void checkBottomRight(double x, double y, ImageView[][] board, String colour, ImageView piece, boolean actualMove) {
-        double newX = x + 100;
-        double newY = y + 100;
-        String opponentColour = getOpponentColour(colour);
-        while (((newX <= 700) && (newY <= 700) && isEmpty(newX, newY, board)) || (newX <= 700) && (newY <= 700) && board[(int) newX / 100][(int) newY / 100].getId().contains(opponentColour)) {
-            addMove(board, opponentColour, newX, newY, piece, actualMove);
-            if (board[(int) newX / 100][(int) newY / 100].getId().contains(opponentColour)) {
-                break;
-            }
-            newX += 100;
-            newY += 100;
-        }
-    }
-    
-    private void checkUpperLeft(double x, double y, ImageView[][] board, String colour, ImageView piece, boolean actualMove) {
-        double newX = x - 100;
-        double newY = y - 100;
-        String opponentColour = getOpponentColour(colour);
-        while (((newX >= 0) && (newY >= 0) && isEmpty(newX, newY, board)) || (newX >= 0) && (newY >= 0) && board[(int) newX / 100][(int) newY / 100].getId().contains(opponentColour)) {
-            addMove(board, opponentColour, newX, newY, piece, actualMove);
-            if (board[(int) newX / 100][(int) newY / 100].getId().contains(opponentColour)) {
-                break;
-            }
-            newX -= 100;
-            newY -= 100;
-        }
-    }
-    
-    private void checkUpperRight(double x, double y, ImageView[][] board, String colour, ImageView piece, boolean actualMove) {
-        double newX = x + 100;
-        double newY = y - 100;
-        String opponentColour = getOpponentColour(colour);
-        while (((newX <= 700) && (newY >= 0) && isEmpty(newX, newY, board)) || (newX <= 700) && (newY >= 0) && board[(int) newX / 100][(int) newY / 100].getId().contains(opponentColour)) {
-            addMove(board, opponentColour, newX, newY, piece, actualMove);
-            if (board[(int) newX / 100][(int) newY / 100].getId().contains(opponentColour)) {
-                break;
-            }
-            newX += 100;
-            newY -= 100;
-        }
+    private boolean checkBounds(double x, double y) {
+        return x >= 0 && x <= 700 && y >= 0 && y <= 700;
     }
     
     private void rookMoves(double x, double y, ImageView[][] board, String colour, ImageView piece, boolean actualMove) {
@@ -473,7 +439,7 @@ public class Run extends Application {
     }
     
     private boolean checkValidMove(double x, double y, ImageView[][] board, String colour) {
-        return x >= 0 && x <= 700 && y >= 0 && y <= 700 && !board[(int) (x) / 100][(int) y / 100].getId().contains(colour);
+        return checkBounds(x, y) && !board[(int) (x) / 100][(int) y / 100].getId().contains(colour);
     }
     
     private boolean validMove(double newX, double newY) {
