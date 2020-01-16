@@ -175,10 +175,9 @@ public class Run extends Application {
     
     private void pickPiece(ImageView[][] board, String colour, ImageView piece) {
         moves.clear();
+        searchForCheckMate(board, colour, piece);
         addPieceMoves(piece, colour, board, true);
         highlightMoves(board, false, colour);
-        
-        searchForCheckMate(board, colour, piece);
     }
     
     private void searchForCheckMate(ImageView[][] board, String colour, ImageView piece) {
@@ -210,6 +209,7 @@ public class Run extends Application {
                 e.printStackTrace();
             }
         }
+        moves.clear();
     }
     
     private void highlightMoves(ImageView[][] board, boolean remove, String colour) {
@@ -289,29 +289,11 @@ public class Run extends Application {
     }
     
     private void kingMoves(double x, double y, ImageView[][] board, String opponentColour, ImageView piece, boolean actualMove) {
-        if (checkValidMove(x - 100, y, board, getOpponentColour(opponentColour))) {
-            addMove(board, opponentColour, x - 100, y, piece, actualMove);
-        }
-        if (checkValidMove(x + 100, y, board, getOpponentColour(opponentColour))) {
-            addMove(board, opponentColour, x + 100, y, piece, actualMove);
-        }
-        if (checkValidMove(x, y + 100, board, getOpponentColour(opponentColour))) {
-            addMove(board, opponentColour, x, y + 100, piece, actualMove);
-        }
-        if (checkValidMove(x, y - 100, board, getOpponentColour(opponentColour))) {
-            addMove(board, opponentColour, x, y - 100, piece, actualMove);
-        }
-        if (checkValidMove(x + 100, y - 100, board, getOpponentColour(opponentColour))) {
-            addMove(board, opponentColour, x + 100, y - 100, piece, actualMove);
-        }
-        if (checkValidMove(x - 100, y - 100, board, getOpponentColour(opponentColour))) {
-            addMove(board, opponentColour, x - 100, y - 100, piece, actualMove);
-        }
-        if (checkValidMove(x - 100, y + 100, board, getOpponentColour(opponentColour))) {
-            addMove(board, opponentColour, x - 100, y + 100, piece, actualMove);
-        }
-        if (checkValidMove(x + 100, y + 100, board, getOpponentColour(opponentColour))) {
-            addMove(board, opponentColour, x + 100, y + 100, piece, actualMove);
+        double[] newX = new double[]{x + 100, x - 100, x + 100, x - 100, x + 100, x - 100, x, x};
+        double[] newY = new double[]{y + 100, y + 100, y - 100, y - 100, y, y, y + 100, y - 100};
+    
+        for (int i = 0; i < 8; i++) {
+            addConsecutiveMoves(newX[i], newY[i], board, getOpponentColour(opponentColour), piece, actualMove, 0, 0, true);
         }
     }
     
@@ -321,13 +303,13 @@ public class Run extends Application {
         double xRight = x + 100;
         double xLeft = x - 100;
     
-        addConsecutiveMoves(xRight, yUp, board, colour, piece, actualMove, 100, -100);//upper right
-        addConsecutiveMoves(xRight, yDown, board, colour, piece, actualMove, 100, 100);//bottom right
-        addConsecutiveMoves(xLeft, yUp, board, colour, piece, actualMove, -100, -100);//upper left
-        addConsecutiveMoves(xLeft, yDown, board, colour, piece, actualMove, -100, 100);//bottom left
+        addConsecutiveMoves(xRight, yUp, board, colour, piece, actualMove, 100, -100, false);//upper right
+        addConsecutiveMoves(xRight, yDown, board, colour, piece, actualMove, 100, 100, false);//bottom right
+        addConsecutiveMoves(xLeft, yUp, board, colour, piece, actualMove, -100, -100, false);//upper left
+        addConsecutiveMoves(xLeft, yDown, board, colour, piece, actualMove, -100, 100, false);//bottom left
     }
     
-    private void addConsecutiveMoves(double newX, double newY, ImageView[][] board, String colour, ImageView piece, boolean actualMove, int xIncrement, int yIncrement) {
+    private void addConsecutiveMoves(double newX, double newY, ImageView[][] board, String colour, ImageView piece, boolean actualMove, int xIncrement, int yIncrement, boolean singleMove) {
         double x = newX;
         double y = newY;
         String opponentColour = getOpponentColour(colour);
@@ -336,20 +318,19 @@ public class Run extends Application {
             if (board[(int) x / 100][(int) y / 100].getId().contains(opponentColour)) {
                 break;
             }
+            if (singleMove) {
+                break;
+            }
             x += xIncrement;
             y += yIncrement;
         }
     }
     
-    private boolean checkBounds(double x, double y) {
-        return x >= 0 && x <= 700 && y >= 0 && y <= 700;
-    }
-    
     private void rookMoves(double x, double y, ImageView[][] board, String colour, ImageView piece, boolean actualMove) {
-        addConsecutiveMoves(x + 100, y, board, colour, piece, actualMove, 100, 0);//all right
-        addConsecutiveMoves(x - 100, y, board, colour, piece, actualMove, -100, 0);//all left
-        addConsecutiveMoves(x, y + 100, board, colour, piece, actualMove, 0, 100);//all up/down
-        addConsecutiveMoves(x, y - 100, board, colour, piece, actualMove, 0, -100);//all down/up
+        addConsecutiveMoves(x + 100, y, board, colour, piece, actualMove, 100, 0, false);//all right
+        addConsecutiveMoves(x - 100, y, board, colour, piece, actualMove, -100, 0, false);//all left
+        addConsecutiveMoves(x, y + 100, board, colour, piece, actualMove, 0, 100, false);//all up/down
+        addConsecutiveMoves(x, y - 100, board, colour, piece, actualMove, 0, -100, false);//all down/up
     }
     
     private boolean isEmpty(double x, double y, ImageView[][] board) {
@@ -358,34 +339,15 @@ public class Run extends Application {
     }
     
     private void knightMoves(ImageView[][] board, String opponentColour, double x, double y, ImageView piece, boolean actualMove) {
-        if (checkValidMove(x + 100, y + 200, board, getOpponentColour(opponentColour))) {
-            addMove(board, opponentColour, x + 100, y + 200, piece, actualMove);
-        }
-        if (checkValidMove(x + 100, y - 200, board, getOpponentColour(opponentColour))) {
-            addMove(board, opponentColour, x + 100, y - 200, piece, actualMove);
-        }
-        if (checkValidMove(x - 100, y + 200, board, getOpponentColour(opponentColour))) {
-            addMove(board, opponentColour, x - 100, y + 200, piece, actualMove);
-        }
-        if (checkValidMove(x - 100, y - 200, board, getOpponentColour(opponentColour))) {
-            addMove(board, opponentColour, x - 100, y - 200, piece, actualMove);
-        }
-        if (checkValidMove(x + 200, y + 100, board, getOpponentColour(opponentColour))) {
-            addMove(board, opponentColour, x + 200, y + 100, piece, actualMove);
-        }
-        if (checkValidMove(x + 200, y - 100, board, getOpponentColour(opponentColour))) {
-            addMove(board, opponentColour, x + 200, y - 100, piece, actualMove);
-        }
-        if (checkValidMove(x - 200, y + 100, board, getOpponentColour(opponentColour))) {
-            addMove(board, opponentColour, x - 200, y + 100, piece, actualMove);
-        }
-        if (checkValidMove(x - 200, y - 100, board, getOpponentColour(opponentColour))) {
-            addMove(board, opponentColour, x - 200, y - 100, piece, actualMove);
+        double[] newX = new double[]{x + 100, x + 100, x - 100, x - 100, x + 200, x + 200, x - 200, x - 200};
+        double[] newY = new double[]{y + 200, y - 200, y + 200, y - 200, y + 100, y - 100, y + 100, y - 100};
+        for (int i = 0; i < 8; i++) {
+            addConsecutiveMoves(newX[i], newY[i], board, getOpponentColour(opponentColour), piece, actualMove, 0, 0, true);
         }
     }
     
-    private boolean checkValidMove(double x, double y, ImageView[][] board, String colour) {
-        return checkBounds(x, y) && !board[(int) (x) / 100][(int) y / 100].getId().contains(colour);
+    private boolean checkBounds(double x, double y) {
+        return x >= 0 && x <= 700 && y >= 0 && y <= 700;
     }
     
     private boolean validMove(double newX, double newY) {
