@@ -189,7 +189,6 @@ public class Run extends Application {
                 }
             }
         }
-        System.out.println(moves.size());
         if (moves.size() == 0) {
             //reset
             String player;
