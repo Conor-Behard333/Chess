@@ -20,7 +20,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Run extends Application {
-    // TODO: 17/01/2020 Add castling, pawn swap and en passant
+    // TODO: 17/01/2020 Add castling and en passant
     private ArrayList<double[]> moves = new ArrayList<>();
     private ArrayList<double[]> tempMoves = new ArrayList<>();
     private boolean p1;
@@ -274,6 +274,11 @@ public class Run extends Application {
             row = 0;
         }
         
+        addNewPiece(board, promotionCol, choice, icons, row);
+        
+    }
+    
+    private void addNewPiece(ImageView[][] board, int promotionCol, String choice, File[] icons, int row) {
         for (File icon : icons) {
             if (icon.toString().contains(choice)) {//finds new piece
                 try {
@@ -289,7 +294,6 @@ public class Run extends Application {
                 break;
             }
         }
-        
     }
     
     private String getChoice() {
